@@ -1,10 +1,33 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+
+	"io/ioutil"
+	"log"
 
 	g "github.com/serpapi/google-search-results-golang"
 )
+
+type Config struct {
+	APIKey string `json:"api_key"`
+}
+
+func get_api_key() string {
+	data, err := ioutil.ReadFile("api.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var config Config
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	return config.APIKey
+}
 
 func get_parameters(keywords string, region string, date_range string) map[string]string {
 	parameters := map[string]string{
@@ -57,7 +80,7 @@ func get_data(data map[string]interface{}) map[string]interface{} {
 }
 
 func main() {
-	api_key := "0ecb616666533ebbc0f849d19ee5dafacf8e86ae34b8b2300e92279fed39a9e3"
+	api_key := get_api_key()
 	parameters := get_parameters("cat", "US", "2025-01-01 2025-02-02")
 	fmt.Println(parameters)
 	search := g.NewGoogleSearch(parameters, api_key)
